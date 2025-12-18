@@ -1,0 +1,33 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.12'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'org.natzi'
+version = '0.0.1'
+description = 'API de autenticación implementando el mecanismo de OTT por correo electronico'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'de.mkammerer:argon2-jvm:2.12'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'tools.jackson.core:jackson-databind:3.0.3'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

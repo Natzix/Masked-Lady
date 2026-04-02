@@ -11,6 +11,13 @@ import lombok.NoArgsConstructor;
 @Table(name = "account")
 public class Account {
 
+    public Account(String username, String email, boolean isActive, AccountType accountType) {
+        this.username = username;
+        this.email = email;
+        this.isActive = isActive;
+        this.accountType = accountType;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -24,8 +31,8 @@ public class Account {
     private boolean isActive;
 
     @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false)
-    private Role roleId;
+    @JoinColumn(name = "type_id", nullable = false)
+    private AccountType accountType;
 
     public Account(String username) {
         this.username = username;

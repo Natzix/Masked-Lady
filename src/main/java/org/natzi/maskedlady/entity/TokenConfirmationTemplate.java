@@ -9,14 +9,13 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @MappedSuperclass
-public class OttToken {
+public class TokenConfirmationTemplate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String username;
-    private String ott;
     private LocalDateTime issuedAt;
     private LocalDateTime expiresAt;
     private boolean used;

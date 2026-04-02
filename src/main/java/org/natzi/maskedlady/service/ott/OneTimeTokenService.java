@@ -1,6 +1,6 @@
 package org.natzi.maskedlady.service.ott;
 
-import org.natzi.maskedlady.entity.OneTimeToken;
+import org.natzi.maskedlady.entity.OneTimeTokenLogin;
 import org.natzi.maskedlady.repository.OneTimeTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.logging.Logger;
 
 @Service
-public class OneTimeTokenService implements TokenManagerStrategy<OneTimeToken> {
+public class OneTimeTokenService implements TokenManagerStrategy<OneTimeTokenLogin> {
 
     private final OneTimeTokenRepository repository;
     private final Logger lg = Logger.getLogger(OneTimeTokenService.class.getName());
@@ -19,9 +19,9 @@ public class OneTimeTokenService implements TokenManagerStrategy<OneTimeToken> {
     }
 
     @Override
-    public void consume(OneTimeToken ott) {
+    public void consume(OneTimeTokenLogin ott) {
         verifyLifeOtt(ott.getExpiresAt(), ott.isUsed());
         ott.setUsed(true);
-        OneTimeToken token = repository.save(ott);
+        OneTimeTokenLogin token = repository.save(ott);
     }
 }

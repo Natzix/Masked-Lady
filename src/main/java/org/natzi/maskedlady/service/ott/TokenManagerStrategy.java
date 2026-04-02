@@ -1,14 +1,14 @@
 package org.natzi.maskedlady.service.ott;
 
 import org.natzi.maskedlady.config.exception.OneTimeTokenException;
-import org.natzi.maskedlady.entity.OttToken;
+import org.natzi.maskedlady.entity.TokenConfirmationTemplate;
 import org.natzi.maskedlady.utils.dto.HasAToken;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
-public interface TokenManagerStrategy<T extends OttToken> {
+public interface TokenManagerStrategy<T extends TokenConfirmationTemplate> {
 
     default HasAToken generate(String username) {
         SecureRandom secureRandom = new SecureRandom();

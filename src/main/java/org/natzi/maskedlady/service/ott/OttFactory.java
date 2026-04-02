@@ -1,8 +1,8 @@
 package org.natzi.maskedlady.service.ott;
 
-import org.natzi.maskedlady.entity.OneTimeToken;
-import org.natzi.maskedlady.entity.OttTimeTable;
-import org.natzi.maskedlady.entity.OttToken;
+import org.natzi.maskedlady.entity.OneTimeTokenLogin;
+import org.natzi.maskedlady.entity.EmailConfirmationUUID;
+import org.natzi.maskedlady.entity.TokenConfirmationTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -11,14 +11,14 @@ import java.util.Map;
 @Service
 public class OttFactory {
 
-    private final Map<Class<?>, TokenManagerStrategy<? extends OttToken>> factories = new HashMap<>();
+    private final Map<Class<?>, TokenManagerStrategy<? extends TokenConfirmationTemplate>> factories = new HashMap<>();
 
     public OttFactory(OneTimeTokenService ott, OneTimeTokenValidation ottv) {
-        factories.put(OneTimeToken.class, ott);
-        factories.put(OttTimeTable.class, ottv);
+        factories.put(OneTimeTokenLogin.class, ott);
+        factories.put(EmailConfirmationUUID.class, ottv);
     }
 
-    public <T extends OttToken> TokenManagerStrategy<T> factoryToken(Class<T> tClass) {
+    public <T extends TokenConfirmationTemplate> TokenManagerStrategy<T> factoryToken(Class<T> tClass) {
         TokenManagerStrategy<?> strategy = factories.get(tClass);
 
         if (strategy == null) {

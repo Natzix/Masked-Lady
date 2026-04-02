@@ -10,14 +10,19 @@ import java.util.Set;
 @Data
 @Entity
 @NoArgsConstructor @AllArgsConstructor
-@Table(name = "role")
-public class Role {
+@Table(name = "account_type")
+public class AccountType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String roleName;
+    private String type;
 
-    @OneToMany(mappedBy = "roleId") // mappedBy => bidireccional
+    @OneToMany(mappedBy = "accountType") // mappedBy => bidireccional
     private Set<Account> accounts;
+
+    public AccountType(int id, String type) {
+        this.id = id;
+        this.type = type;
+    }
 }

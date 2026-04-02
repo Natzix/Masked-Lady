@@ -12,6 +12,6 @@ public record CreateAccountDTO(
         String email,
 
         @NotNull
-        int role
+        int type
 ) {
 }

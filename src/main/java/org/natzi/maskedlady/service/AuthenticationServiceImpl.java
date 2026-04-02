@@ -1,12 +1,18 @@
 package org.natzi.maskedlady.service;
 
+import com.nimbusds.jose.JOSEException;
+import jakarta.persistence.EntityManager;
+import org.natzi.maskedlady.config.exception.NimbusJoseException;
 import org.natzi.maskedlady.entity.Account;
-import org.natzi.maskedlady.entity.OneTimeToken;
-import org.natzi.maskedlady.entity.OttTimeTable;
+import org.natzi.maskedlady.entity.AccountType;
+import org.natzi.maskedlady.entity.OneTimeTokenLogin;
+import org.natzi.maskedlady.entity.EmailConfirmationUUID;
+import org.natzi.maskedlady.repository.AccountRepository;
 import org.natzi.maskedlady.service.email.EmailService;
 import org.natzi.maskedlady.service.ott.OneTimeTokenService;
 import org.natzi.maskedlady.service.ott.OneTimeTokenValidation;
 import org.natzi.maskedlady.utils.dto.*;
+import org.natzi.maskedlady.utils.jwt.JoseJwtSetting;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,13 +22,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final OneTimeTokenValidation serviceValidationOtt;
     private final OneTimeTokenService serviceOtt;
     private final EmailService serviceEmail;
+    private final JoseJwtSetting jwt;
+    private final AccountRepository accountRepository;
 
     public AuthenticationServiceImpl(WorkForAuthentication serviceWorkAuth, OneTimeTokenValidation serviceValidationOtt,
-                                     OneTimeTokenService serviceOtt, EmailService serviceEmail) {
+                                     OneTimeTokenService serviceOtt, EmailService serviceEmail, JoseJwtSetting jwt,
+                                     AccountRepository accountRepository) {
         this.serviceWorkAuth = serviceWorkAuth;
         this.serviceValidationOtt = serviceValidationOtt;
         this.serviceOtt = serviceOtt;
         this.serviceEmail = serviceEmail;
+        this.jwt = jwt;
+        this.accountRepository = accountRepository;
     }
 
     @Override
@@ -31,16 +42,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String email = accountDTO.email();
 
         serviceWorkAuth.ensureAccountDoesNotExist(username);
-        serviceWorkAuth.searchRole(accountDTO.role());
+        serviceWorkAuth.searchType(accountDTO.type());
         serviceWorkAuth.emailIsPresent(email);
 
         HasAToken hasAToken = serviceOtt.generate(username);
 
-        OttTimeTable ottTimeTable = serviceWorkAuth
+        EmailConfirmationUUID emailConfirmation = serviceWorkAuth
                 .validateEmailBeforeSaving(hasAToken, email);
 
+        accountRepository.save(new Account(username, email, false, new AccountType(1, "")));
+
         return new SendEmailDTO(
-                ottTimeTable.getId(),
+                emailConfirmation.getId(),
                 "Validación de Correo Electronico",
                 username,
                 email,
@@ -65,26 +78,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public AccountCreatedDTO verifyAccountRegistration(String ott) {
-        OttTimeTable ottTime = serviceWorkAuth.searchAccountRegistrationOtt(ott);
+    public void verifyAccountRegistration(String ott) {
+        EmailConfirmationUUID ottTime = serviceWorkAuth.searchAccountRegistrationOtt(ott);
         serviceValidationOtt.consume(ottTime);
 
-        String username = ottTime.getUsername();
-        String email = ottTime.getEmail();
+        serviceWorkAuth.saveAsVerifiedAccount(ottTime.getUsername());
 
-        CreateAccountDTO accountDTO = new CreateAccountDTO(
-                username,
-                email,
-                1
-        );
-        Account account = serviceWorkAuth.createAccount(accountDTO);
-
-        return new AccountCreatedDTO(account.getId(), username, email);
     }
 
     @Override
-    public void verifyLoginOtt(String ott) {
-        OneTimeToken token = serviceWorkAuth.searchLoginOtt(ott);
+    public String verifyLoginOtt(String ott) {
+        OneTimeTokenLogin token = serviceWorkAuth.searchLoginOtt(ott);
         serviceOtt.consume(token);
+
+        try {
+            return jwt.buildJWT(token);
+        } catch (JOSEException ex) {
+            throw new NimbusJoseException("Error al construir el JWT", ex);
+        }
     }
 }

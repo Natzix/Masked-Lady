@@ -108,7 +108,7 @@ public class HtmlTemplate {
                 "                    <!-- Subtítulo -->\n" +
                 "                    <tr>\n" +
                 "                        <td style=\"font-size:22px; font-weight:bold; color:#4a4a4a; padding-top:20px; padding-bottom:15px; text-align:center;\">\n" +
-                "                            Verificación de correo electronico\n" +
+                "                            Validar correo\n" +
                 "                        </td>\n" +
                 "                    </tr>\n" +
                 "\n" +

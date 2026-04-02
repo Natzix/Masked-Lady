@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -14,11 +13,13 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 @Component
-public class MaskedFilterJwt extends OncePerRequestFilter {
-    private static final String BEARER_PREFIX = "Bearer ";
-    private AntPathMatcher antMatcher = new AntPathMatcher();
+public class CustomFilterJWT extends OncePerRequestFilter {
 
-    private final Logger lg = Logger.getLogger(MaskedFilterJwt.class.getName());
+    private static final String BEARER_PREFIX = "Bearer ";
+    private final AntPathMatcher antMatcher = new AntPathMatcher();
+    private final Logger lg = Logger.getLogger(CustomFilterJWT.class.getName());
+
+
 
     // Evita que se ingrese al filtro de autenticación y autorizacion
     @Override
@@ -33,10 +34,11 @@ public class MaskedFilterJwt extends OncePerRequestFilter {
         String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith(BEARER_PREFIX)) {
-            response.sendError(HttpStatus.BAD_REQUEST.value(), "The request cannot be processed");
+            filterChain.doFilter(request, response);
             return;
         }
-        lg.info("Pasa por este filrtro");
+        String jwt = header.substring(BEARER_PREFIX.length());
+
         filterChain.doFilter(request, response);
     }
 }

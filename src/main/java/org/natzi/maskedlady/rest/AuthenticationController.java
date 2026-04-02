@@ -36,20 +36,20 @@ public class AuthenticationController {
 
     @GetMapping("/login/verify")
     public ResponseEntity<ResponseEntityDTO> loginProcess(@RequestParam(name = "ott") String ott) {
-        serviceAuth.verifyLoginOtt(ott);
+        String jwt = serviceAuth.verifyLoginOtt(ott);
 
         return  ResponseEntity.ok(
-                new ResponseEntityDTO("Bienvenido", HttpStatus.OK.value())
+                new ResponseEntityDTO(jwt, HttpStatus.OK.value())
         );
     }
 
     @PostMapping("/create-account")
     public ResponseEntity<SendEmailDTO> createAccount(@RequestBody @Valid CreateAccountDTO createAccountDTO, HttpServletRequest request) {
-        SendEmailDTO validateEmail = serviceAuth.createAccount(createAccountDTO);
+        SendEmailDTO contentEmail = serviceAuth.createAccount(createAccountDTO);
 
-        emailService.sendValidationEmail(validateEmail, request.getRequestURI());
+        emailService.sendValidationEmail(contentEmail, request.getRequestURI());
 
-        int id = validateEmail.id();
+        int id = contentEmail.id();
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -58,22 +58,19 @@ public class AuthenticationController {
                 .toUri();
 
         return ResponseEntity.created(uri)
-                .body(validateEmail);
+                .body(contentEmail);
     }
 
     @GetMapping("/create-account/verify")
-    public ResponseEntity<AccountCreatedDTO> registrationProcess(@RequestParam(name = "ott") String ott) {
+    public ResponseEntity<String> registrationProcess(@RequestParam(name = "ott") String ott) {
+        serviceAuth.verifyAccountRegistration(ott);
 
-        AccountCreatedDTO account = serviceAuth.verifyAccountRegistration(ott);
+        return ResponseEntity.ok()
+                .body("Tu cuenta se creo satisfactoriamente");
+    }
 
-        int id = account.id();
-        URI uri = ServletUriComponentsBuilder
-                .fromCurrentRequestUri()
-                .path("/{id}")
-                .buildAndExpand(id)
-                .toUri();
-
-        return ResponseEntity.created(uri)
-                .body(account);
+    @GetMapping("/test-hello")
+    public String test() {
+        return "Hola ingresaste";
     }
 }

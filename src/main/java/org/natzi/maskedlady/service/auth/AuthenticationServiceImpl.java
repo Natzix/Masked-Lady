@@ -1,7 +1,6 @@
-package org.natzi.maskedlady.service;
+package org.natzi.maskedlady.service.auth;
 
 import com.nimbusds.jose.JOSEException;
-import jakarta.persistence.EntityManager;
 import org.natzi.maskedlady.config.exception.NimbusJoseException;
 import org.natzi.maskedlady.entity.Account;
 import org.natzi.maskedlady.entity.AccountType;
@@ -96,5 +95,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } catch (JOSEException ex) {
             throw new NimbusJoseException("Error al construir el JWT", ex);
         }
+    }
+
+    @Override
+    public AccountDTO deleteUser(String username) {
+        Account accountToBeDeleted = serviceWorkAuth.ensureAccountExists(username);
+        accountRepository.delete(accountToBeDeleted);
+
+        return new AccountDTO(accountToBeDeleted.getId(),
+                accountToBeDeleted.getUsername(),
+                accountToBeDeleted.getEmail());
     }
 }

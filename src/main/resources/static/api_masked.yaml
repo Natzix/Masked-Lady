@@ -1,0 +1,122 @@
+openapi: 3.1.0
+info:
+  title: Masked Lady
+  description:
+    Authentication API based on the OTT mechanism
+  version: 1.0.0-beta
+servers:
+  - url: 'http://localhost:8080/masked-auth'
+
+paths:
+  /login:
+    post:
+      tags:
+        - Authentication-Controller
+      summary: User Login
+      requestBody:
+        description: JSON object for validating the username
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AccountLoginDTO"
+      responses:
+        200:
+          description:
+            Correct login
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseEntity"
+
+  /login/verify:
+    get:
+      tags:
+        - Authentication-Controller
+      summary: Process Login
+      parameters:
+        - name: ott
+          required: true
+          in: query
+          description: Contains the OTT to verify the login
+          schema:
+            type: string
+      responses:
+        200:
+          description:
+            OK - Everything went smoothly and the JWT is returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseEntity"
+
+  /create-account:
+    post:
+      tags:
+        - Authentication-Controller
+      summary: Create an account
+      requestBody:
+        required: true
+        description: JSON required for account creation
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAccountDTO"
+      responses:
+        201:
+          description: CREATED
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: User ID created
+
+          links:
+            GetUserByUserId:
+              operationRef: '#/paths/~1users~1{userId}/get'
+              parameters:
+                userId: '$response.body#/id'
+  /user:
+    get:
+      tags:
+        - Authentication-Controller
+      summary: Search for a user by ID
+      parameters:
+        - name: id
+          required: true
+          in: query
+          schema:
+            type: integer
+      responses:
+        200:
+          description: OK - The correct user was found
+
+
+components:
+  schemas:
+    AccountLoginDTO:
+      type: object
+      properties:
+        username:
+          type: string
+
+    CreateAccountDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        type:
+          type: integer
+
+    ResponseEntity:
+      type: object
+      properties:
+        content:
+          type: string
+        status:
+          type: integer

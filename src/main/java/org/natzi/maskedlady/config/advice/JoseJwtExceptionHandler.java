@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class JoseJwtExceptionHandler {
-
-
     @ExceptionHandler(NimbusJoseException.class)
     public ResponseEntity<ResponseExceptionDTO> handleExceptionBuild(NimbusJoseException ex) {
         ResponseExceptionDTO error = new ResponseExceptionDTO(HttpStatus.BAD_GATEWAY.value(), ex.getMessage());

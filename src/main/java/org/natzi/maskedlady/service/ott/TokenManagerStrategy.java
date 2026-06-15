@@ -29,10 +29,10 @@ public interface TokenManagerStrategy<T extends TokenConfirmationTemplate> {
         LocalDateTime now = LocalDateTime.now();
 
         if (expireAt.isBefore(now)) {
-            throw new OneTimeTokenException("El token ya no puede ser utilizado");
+            throw new OneTimeTokenException("The token can no longer be used");
         }
         if (used) {
-            throw new OneTimeTokenException("El token ya se uso");
+            throw new OneTimeTokenException("The token is in use");
         }
     }
 

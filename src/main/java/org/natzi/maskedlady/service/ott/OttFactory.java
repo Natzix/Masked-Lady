@@ -24,7 +24,6 @@ public class OttFactory {
         if (strategy == null) {
             throw new IllegalArgumentException(tClass + "no tiene soporte de implementación");
         }
-
         return (TokenManagerStrategy<T>) strategy;
     }
 }

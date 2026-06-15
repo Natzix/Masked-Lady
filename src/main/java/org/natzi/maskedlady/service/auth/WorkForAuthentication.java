@@ -1,4 +1,4 @@
-package org.natzi.maskedlady.service;
+package org.natzi.maskedlady.service.auth;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;

@@ -6,7 +6,7 @@ plugins {
 
 group = 'org.natzi'
 version = '0.0.1'
-description = 'API de autenticación implementando el mecanismo de OTT por correo electronico'
+description = 'API de autenticación con el mecanismo OTT'
 
 java {
 	toolchain {
@@ -26,6 +26,7 @@ dependencies {
     implementation 'de.mkammerer:argon2-jvm:2.12'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'com.nimbusds:nimbus-jose-jwt:10.8'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.16'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

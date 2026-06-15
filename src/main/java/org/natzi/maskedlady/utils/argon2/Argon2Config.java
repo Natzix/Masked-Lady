@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 
+@Deprecated
 @Component
 public class Argon2Config {
     private static final int ITERATIONS = 2;

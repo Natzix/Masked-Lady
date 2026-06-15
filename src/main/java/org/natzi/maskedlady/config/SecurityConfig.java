@@ -25,8 +25,10 @@ public class SecurityConfig {
                 .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests((authorize) -> {
                     authorize
-                        .requestMatchers(EndPointSecurity.PERMIT_SN_JWT).permitAll()
-                        .requestMatchers(EndPointSecurity.WITH_JWT).authenticated();
+                        .requestMatchers(EndPointSecurity.ALLOW_REQUEST_NO_JWT).permitAll()
+                            .requestMatchers(EndPointSecurity.ALLOW_SWAGGER_REQUESTS).permitAll()
+                        .requestMatchers(EndPointSecurity.WITH_JWT).authenticated()
+                            .anyRequest().denyAll();
                 })
                 .addFilterAt(new CustomFilterJWT(), BasicAuthenticationFilter.class);
         return http.build();

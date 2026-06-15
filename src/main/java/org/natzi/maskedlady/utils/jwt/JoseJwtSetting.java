@@ -39,7 +39,7 @@ public class JoseJwtSetting {
 
         return new JWTClaimsSet.Builder()
                 .subject(ott.getUsername())
-                .issuer("masked-lady") // ayuda a identificar la entidad que creo el jwt
+                .issuer("masked-lady") // ayuda a identificar la entidad que creo el jwt3
                 .issueTime(new Date())
                 .expirationTime(expire)
                 .build();

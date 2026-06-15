@@ -9,6 +9,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -25,7 +26,7 @@ public class CustomFilterJWT extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return Stream.of(EndPointSecurity.PERMIT_SN_JWT)
+        return Stream.concat(Arrays.stream(EndPointSecurity.ALLOW_REQUEST_NO_JWT), Arrays.stream(EndPointSecurity.ALLOW_SWAGGER_REQUESTS))
                 .anyMatch(pattern -> antMatcher.match(pattern, path));
     }
 

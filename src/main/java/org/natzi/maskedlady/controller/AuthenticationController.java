@@ -1,18 +1,22 @@
-package org.natzi.maskedlady.rest;
+package org.natzi.maskedlady.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import org.natzi.maskedlady.service.AuthenticationService;
+import jakarta.validation.constraints.NotBlank;
+import org.natzi.maskedlady.service.auth.AuthenticationService;
 import org.natzi.maskedlady.service.email.EmailService;
 import org.natzi.maskedlady.utils.dto.*;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.logging.Logger;
 
+@Validated
 @RestController
 @RequestMapping("/masked-auth")
 public class AuthenticationController {
@@ -26,8 +30,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ResponseEntityDTO> login(@RequestBody @Valid AccountLoginDTO login, HttpServletRequest request) {
-        serviceAuth.login(login, request.getRequestURI());
+    public ResponseEntity<ResponseEntityDTO> login(@RequestBody @Valid AccountLoginDTO dtoLogin, HttpServletRequest request) {
+        serviceAuth.login(dtoLogin, request.getRequestURI());
 
         return ResponseEntity.ok(
                 new ResponseEntityDTO("Enlace de inicio de sesion enviado", HttpStatus.OK.value())
@@ -35,7 +39,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/login/verify")
-    public ResponseEntity<ResponseEntityDTO> loginProcess(@RequestParam(name = "ott") String ott) {
+    public ResponseEntity<ResponseEntityDTO> loginProcess(@NotBlank @RequestParam(name = "ott") String ott) {
         String jwt = serviceAuth.verifyLoginOtt(ott);
 
         return  ResponseEntity.ok(
@@ -44,13 +48,12 @@ public class AuthenticationController {
     }
 
     @PostMapping("/create-account")
-    public ResponseEntity<SendEmailDTO> createAccount(@RequestBody @Valid CreateAccountDTO createAccountDTO, HttpServletRequest request) {
-        SendEmailDTO contentEmail = serviceAuth.createAccount(createAccountDTO);
+    public ResponseEntity<SendEmailDTO> createAccount(@RequestBody @Valid CreateAccountDTO dtoCreateAccount, HttpServletRequest request) {
+        SendEmailDTO contentEmail = serviceAuth.createAccount(dtoCreateAccount);
 
         emailService.sendValidationEmail(contentEmail, request.getRequestURI());
 
         int id = contentEmail.id();
-
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
                 .path("/{id}")
@@ -62,15 +65,22 @@ public class AuthenticationController {
     }
 
     @GetMapping("/create-account/verify")
-    public ResponseEntity<String> registrationProcess(@RequestParam(name = "ott") String ott) {
+    public ResponseEntity<String> registrationProcess(@NotBlank @RequestParam(name = "ott") String ott) {
         serviceAuth.verifyAccountRegistration(ott);
 
         return ResponseEntity.ok()
                 .body("Tu cuenta se creo satisfactoriamente");
     }
 
-    @GetMapping("/test-hello")
-    public String test() {
-        return "Hola ingresaste";
+    @GetMapping("/delete-user")
+    public ResponseEntity<ResponseEntityDTO> deleteUser(@NotBlank @RequestParam(name = "username") String username) {
+        AccountDTO accountDeletedDTO = serviceAuth.deleteUser(username);
+
+        String message = "The user with the username " + accountDeletedDTO.username() + " has been deleted";
+
+        return ResponseEntity.ok(
+          new ResponseEntityDTO(message,
+                  HttpStatus.OK.value())
+        );
     }
 }
